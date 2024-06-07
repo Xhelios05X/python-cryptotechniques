@@ -17,5 +17,9 @@ def encriptionAES(stringToEncode:str, password:str):
     # makes a ciphered data based on cipher object
     ciphered_data = cipher.encrypt(pad(stringToEncode, AES.block_size))
 
+    with open("encyptedFile.bin", "wb") as f:
+        f.write(cipher.iv)
+        f.write(ciphered_data)
+
 if __name__ == "__main__":
     pass

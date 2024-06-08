@@ -15,7 +15,16 @@ import rsa
 def Help():
     parser = argparse.ArgumentParser(
         prog = "CurrencyExchangeRate.py",
-        description = "ToDo",
+        description = """
+Script has two options: an encryption with using an AES algorithm and 
+creating a digital signature for the file using RSA keys \n
+Usage:
+AES encryption
+> python3 cryptoTechniques.py --aes filename password
+
+Creating a digital signature
+> python3 cryptoTechniques.py --dsignature filename
+        """,
     )
 
     parser.add_argument("--aes", action = "store_true")

@@ -6,10 +6,10 @@ from Crypto.Util.Padding import pad, unpad
 import argparse
 import sys
 
+import rsa 
+
 # ToDo
 # - add description
-# - add argument 1
-# - add argument 2
 
 
 def Help():
@@ -19,13 +19,39 @@ def Help():
     )
 
     parser.add_argument("--aes", action = "store_true")
+    parser.add_argument("--dsignature", action = "store_true")
     parser.add_argument("filename")
-    parser.add_argument("password")
-    # Todo: add arguments
+    parser.add_argument("password",
+                        nargs = "?",
+                        help = "optional argument to the AES encription")
 
     args = parser.parse_args()
     return args
 
+def RSAkeys():
+    (pubkey, privkey) = rsa.newkeys(2048)
+    return (pubkey, privkey,)
+
+def DigitalSignature(filename: str):
+    
+    # it's tuple
+    # rsaKeys[0] - public key
+    # rsaKeys[1] - private key
+    rsaKeys = RSAkeys()
+
+    # opening file
+    file = open(filename, "rb")
+    fileData = file.read()
+    file.close()
+
+    # creating a hash and encrypting it with RSA private key
+    signature = rsa.sign(fileData, rsaKeys[1], "SHA-256")
+
+    # saving a digital signature to the file
+    file = open(f"{filename}_signature", "wb")
+    file.write(signature)
+    file.close()
+    print(f"It's your public key:\n {rsaKeys[0]}")
 
 def encriptionAES(stringToEncode:str, password:str):
     salt = "b'\x13\x85Q[W\xc8\x12Y \x81\xec\xb0%)\x15\xb5'"
@@ -46,17 +72,21 @@ def encriptionAES(stringToEncode:str, password:str):
 
 
 # main function
-# sys.argv[1] - filename
-# sys.argv[2] - password
 if __name__ == "__main__":
     help = Help()
 
-    filename = sys.argv[1]
-    password = sys.argv[2]
+    filename = help.filename
+    password = help.password
 
     if help.aes:
         with open(filename, "r") as f:
             stringToEncode = f.read()
         
         encriptionAES(stringToEncode, password)
-    
+
+    elif help.dsignature:
+        DigitalSignature(filename)
+
+    elif not help.dsignature and not help.aes:
+        print("You have to choose one of the options")
+        sys.exit(-1)

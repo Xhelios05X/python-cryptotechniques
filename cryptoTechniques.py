@@ -79,10 +79,16 @@ if __name__ == "__main__":
     password = help.password
 
     if help.aes:
-        with open(filename, "r") as f:
-            stringToEncode = f.read()
+        if type(password) == "NoneType":
+            sys.exit(-1)
+
+        try:
+            with open(filename, "r") as f:
+                stringToEncode = f.read()
         
-        encriptionAES(stringToEncode, password)
+            encriptionAES(stringToEncode, password)
+        except:
+            sys.exit(-1)
 
     elif help.dsignature:
         DigitalSignature(filename)
